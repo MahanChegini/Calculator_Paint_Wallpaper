@@ -1,122 +1,395 @@
-import { useState } from "react";
-import { Switch } from "@/components/ui/switch";
-import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
-import { motion } from "framer-motion";
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>محاسبه‌گر تخصصی طراحی داخلی</title>
+  
+  <!-- فونت وزیر از گوگل فونت -->
+  <link href="https://cdn.fontcdn.ir/woff/ Vazir.woff2" rel="stylesheet" />
+  <style>
+    @font-face {
+      font-family: 'Vazir';
+      src: url('https://cdn.fontcdn.ir/woff/Vazir.woff2') format('woff2');
+      font-weight: normal;
+      font-style: normal;
+    }
+    * {
+      box-sizing: border-box;
+      font-family: 'Vazir', sans-serif;
+      direction: rtl;
+    }
+    body {
+      margin: 0; padding: 0;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background 0.3s ease;
+    }
+    .dark {
+      background: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%);
+      color: #eee;
+    }
 
-const roomTips = {
-  "اتاق کودک": "رنگ پیشنهادی: آبی ملایم یا سبز نعناعی. از رنگ‌های بدون بو و ضد حساسیت استفاده کن.",
-  "پذیرایی": "از رنگ‌های گرم و کاغذ دیواری مینیمال استفاده کن. دیوار اصلی رو خیلی شلوغ نکن.",
-  "حمام": "از رنگ‌های روشن و ضد آب استفاده کن. رنگ‌های سرد مثل طوسی روشن مناسب هستن.",
-  "آشپزخانه": "رنگ‌های قابل شست‌وشو و روشن مثل سفید یا کرم. کاغذ دیواری مناسب نیست."
-};
+    /* پس‌زمینه مینیمال خطوط پلان */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-image:
+        linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: -1;
+      transition: background 0.3s ease;
+    }
+    .dark body::before {
+      background-image:
+        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+    }
 
-const brands = {
-  "کاپارول": 320000,
-  "سحر": 250000,
-  "نیپون": 280000
-};
+    /* فرم وسط صفحه با انیمیشن */
+    .form-container {
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(15px);
+      border-radius: 15px;
+      padding: 25px 35px;
+      max-width: 450px;
+      width: 90vw;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      animation: fadeInScale 0.5s ease forwards;
+      position: relative;
+    }
+    .dark .form-container {
+      background: rgba(30, 30, 40, 0.5);
+      box-shadow: 0 8px 32px 0 rgba(255, 255, 255, 0.1);
+    }
+    @keyframes fadeInScale {
+      from {opacity: 0; transform: scale(0.9);}
+      to {opacity: 1; transform: scale(1);}
+    }
 
-const InteriorCalculator = () => {
-  const [theme, setTheme] = useState("light");
-  const [form, setForm] = useState({
-    name: "",
-    width: "",
-    length: "",
-    height: "",
-    walls: "",
-    windowArea: "",
-    wallType: "گچی",
-    brand: "کاپارول"
-  });
+    h1 {
+      font-weight: 700;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      text-align: center;
+      color: #1e2d4a;
+    }
+    .dark h1 {
+      color: #a8c0ff;
+    }
 
-  const toggleTheme = () => {
-    setTheme(theme === "light" ? "dark" : "light");
-    document.documentElement.classList.toggle("dark");
-  };
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: #333;
+    }
+    .dark label {
+      color: #ccc;
+    }
 
-  const surfaceArea = () => {
-    const w = parseFloat(form.width);
-    const l = parseFloat(form.length);
-    const h = parseFloat(form.height);
-    const walls = parseInt(form.walls);
-    const win = parseFloat(form.windowArea);
-    if (isNaN(w) || isNaN(l) || isNaN(h) || isNaN(walls)) return 0;
-    return (walls * h * (w + l) / 2) - (win || 0);
-  };
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 8px 12px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: 1.5px solid #aaa;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+      background: #fff;
+      color: #222;
+    }
+    .dark input[type="text"],
+    .dark input[type="number"],
+    .dark select {
+      background: #222;
+      color: #eee;
+      border-color: #666;
+    }
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    select:focus {
+      border-color: #4a90e2;
+      outline: none;
+    }
 
-  const calcPaint = () => {
-    const area = surfaceArea();
-    const price = brands[form.brand];
-    const literPerM2 = 0.1;
-    const needed = Math.ceil(area * literPerM2 / 4); // assuming each can is 4L
-    return { needed, price: needed * price };
-  };
+    /* دکمه سوییچ تم */
+    .theme-switch-wrapper {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 50px;
+      padding: 5px 10px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      transition: background 0.3s ease;
+      z-index: 1000;
+    }
+    .dark .theme-switch-wrapper {
+      background: rgba(0,0,0,0.5);
+    }
+    .theme-switch-wrapper span {
+      font-size: 1.2rem;
+      margin: 0 5px;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 26px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 34px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 4px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #2196F3;
+    }
+    input:checked + .slider:before {
+      transform: translateX(24px);
+    }
 
-  const { needed, price } = calcPaint();
+    /* باکس نکات */
+    .tips-box {
+      margin-top: 15px;
+      padding: 12px 15px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 12px;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      color: #333;
+    }
+    .dark .tips-box {
+      background: rgba(50, 50, 60, 0.6);
+      color: #ddd;
+    }
 
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-neutral-900 px-4">
-      <div className="absolute top-4 right-4">
-        <Switch checked={theme === "dark"} onCheckedChange={toggleTheme}>
-          <span className="ml-2">{theme === "dark" ? "🌙" : "☀️"}</span>
-        </Switch>
-      </div>
-      <motion.div
-        className="w-full max-w-xl bg-white dark:bg-neutral-800 p-6 rounded-2xl shadow-2xl"
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <h2 className="text-2xl font-bold mb-4 text-center font-iranYekan dark:text-white">
-          محاسبه‌گر تخصصی طراحی داخلی – مناسب معماران و نقاشان
-        </h2>
-        <div className="space-y-3">
-          <Input
-            placeholder="نام فضا (مثلاً پذیرایی، اتاق کودک، ... )"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-          />
-          <Input placeholder="طول (متر)" value={form.length} onChange={(e) => setForm({ ...form, length: e.target.value })} />
-          <Input placeholder="عرض (متر)" value={form.width} onChange={(e) => setForm({ ...form, width: e.target.value })} />
-          <Input placeholder="ارتفاع (متر)" value={form.height} onChange={(e) => setForm({ ...form, height: e.target.value })} />
-          <Input placeholder="تعداد دیوارها" value={form.walls} onChange={(e) => setForm({ ...form, walls: e.target.value })} />
-          <Input placeholder="مجموع متراژ پنجره‌ها" value={form.windowArea} onChange={(e) => setForm({ ...form, windowArea: e.target.value })} />
-          <select
-            className="w-full p-2 rounded border border-gray-300"
-            value={form.wallType}
-            onChange={(e) => setForm({ ...form, wallType: e.target.value })}
-          >
-            <option>گچی</option>
-            <option>سیمانی</option>
-            <option>رنگ‌شده قبلی</option>
-            <option>کاغذی</option>
-          </select>
-          <select
-            className="w-full p-2 rounded border border-gray-300"
-            value={form.brand}
-            onChange={(e) => setForm({ ...form, brand: e.target.value })}
-          >
-            {Object.keys(brands).map((b) => (
-              <option key={b}>{b}</option>
-            ))}
-          </select>
-        </div>
-        <div className="mt-6 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-white">
-          {form.name && roomTips[form.name] && (
-            <p className="text-sm">💡 {roomTips[form.name]}</p>
-          )}
-          <p className="mt-2">🎨 متراژ سطح: {surfaceArea().toFixed(2)} مترمربع</p>
-          <p>🔲 تعداد قوطی رنگ موردنیاز: {needed} عدد</p>
-          <p>💰 قیمت حدودی: {price.toLocaleString()} تومان</p>
-        </div>
-        <div className="mt-4 text-sm text-gray-700 dark:text-gray-300">
-          <p>• رنگ پیشنهادی برای فضای کودک: آبی ملایم یا سبز نعناعی</p>
-          <p>• کاغذ دیواری طرح گل‌دار برای دیوار اصلی پذیرایی توصیه نمی‌شود</p>
-          <p>• سقف کوتاه داری؟ از رنگ‌های روشن استفاده کن</p>
-        </div>
-      </motion.div>
+    /* دکمه محاسبه */
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #4a90e2;
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #357ABD;
+    }
+
+    /* بخش نمایش نتیجه */
+    .result-box {
+      margin-top: 20px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 12px;
+      padding: 15px;
+      font-size: 1rem;
+      color: #111;
+      min-height: 80px;
+    }
+    .dark .result-box {
+      background: rgba(40,40,50,0.7);
+      color: #eee;
+    }
+
+    /* آیکون‌ها */
+    .material-icon {
+      width: 18px;
+      height: 18px;
+      vertical-align: middle;
+      margin-left: 5px;
+      opacity: 0.7;
+    }
+    /* راهنمایی هر فضا */
+    .help-text {
+      font-size: 0.85rem;
+      color: #555;
+      margin-bottom: 10px;
+      font-style: italic;
+    }
+    .dark .help-text {
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- دکمه تغییر تم -->
+  <div class="theme-switch-wrapper" title="تغییر حالت روشن/تاریک">
+    <span>✨</span>
+    <label class="switch">
+      <input type="checkbox" id="themeToggle" />
+      <span class="slider"></span>
+    </label>
+    <span>🌙</span>
+  </div>
+
+  <div class="form-container" role="main" aria-label="فرم محاسبه‌گر طراحی داخلی">
+
+    <h1>محاسبه‌گر تخصصی طراحی داخلی<br><small>مناسب معماران و نقاشان</small></h1>
+
+    <!-- نام فضا -->
+    <label for="spaceName">نام فضا</label>
+    <select id="spaceName" required aria-describedby="spaceHelp" aria-required="true">
+      <option value="">انتخاب کنید...</option>
+      <option value="livingRoom">پذیرایی</option>
+      <option value="kidsRoom">اتاق کودک</option>
+      <option value="bathroom">حمام</option>
+      <option value="kitchen">آشپزخانه</option>
+      <option value="office">دفتر کار</option>
+    </select>
+    <div id="spaceHelp" class="help-text" aria-live="polite">لطفا یک فضای مورد نظر را انتخاب کنید.</div>
+
+    <!-- ابعاد -->
+    <label for="length">طول (متر)</label>
+    <input type="number" id="length" min="1" step="0.1" placeholder="مثلاً 5" required />
+
+    <label for="width">عرض (متر)</label>
+    <input type="number" id="width" min="1" step="0.1" placeholder="مثلاً 4" required />
+
+    <label for="height">ارتفاع (متر)</label>
+    <input type="number" id="height" min="1.5" step="0.1" placeholder="مثلاً 3" required />
+
+    <!-- تعداد دیوارها -->
+    <label for="wallCount">تعداد دیوارها</label>
+    <input type="number" id="wallCount" min="1" max="6" step="1" placeholder="مثلاً 4" required />
+
+    <!-- متراژ پنجره‌ها -->
+    <label for="windowArea">متراژ کل پنجره‌ها (متر مربع)</label>
+    <input type="number" id="windowArea" min="0" step="0.1" placeholder="مثلاً 3.5" value="0" required />
+
+    <!-- جنس دیوار -->
+    <label for="wallMaterial">جنس دیوار</label>
+    <select id="wallMaterial" required>
+      <option value="">انتخاب کنید...</option>
+      <option value="plaster">گچی</option>
+      <option value="cement">سیمانی</option>
+      <option value="painted">رنگ‌شده قبلی</option>
+      <option value="wallpaper">کاغذی</option>
+    </select>
+
+    <!-- نوع رنگ -->
+    <label for="paintType">نوع رنگ</label>
+    <select id="paintType" required>
+      <option value="">انتخاب کنید...</option>
+      <option value="plastic" data-price="150000">پلاستیکی (هر لیتر 150,000 تومان)</option>
+      <option value="acrylic" data-price="250000">اکریلیک (هر لیتر 250,000 تومان)</option>
+      <option value="oil" data-price="300000">روغنی (هر لیتر 300,000 تومان)</option>
+    </select>
+
+    <!-- برند رنگ -->
+    <label for="paintBrand">برند رنگ</label>
+    <select id="paintBrand" required>
+      <option value="">انتخاب کنید...</option>
+      <option value="kaparol">کاپارول</option>
+      <option value="sahar">سحر</option>
+      <option value="nippon">نیپون</option>
+    </select>
+
+    <button id="calculateBtn">محاسبه</button>
+
+    <!-- نمایش نتایج -->
+    <div class="result-box" id="result" aria-live="polite" role="region" tabindex="0">
+      نتیجه محاسبه اینجا نمایش داده می‌شود.
     </div>
-  );
-};
 
-export default InteriorCalculator;
+    <!-- نکات پیشنهادی -->
+    <div class="tips-box" id="tipsBox" aria-live="polite">
+      رنگ پیشنهادی برای فضای کودک: آبی ملایم یا سبز نعناعی<br/>
+      کاغذ دیواری طرح گل‌دار برای دیوار اصلی پذیرایی توصیه نمی‌شود<br/>
+      سقف کوتاه داری؟ از رنگ‌های روشن استفاده کن
+    </div>
+  </div>
+
+  <script>
+    // تغییر تم روشن/تاریک
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.addEventListener('change', () => {
+      document.body.classList.toggle('dark', themeToggle.checked);
+    });
+
+    // راهنمایی براساس نام فضا
+    const spaceNameSelect = document.getElementById('spaceName');
+    const spaceHelp = document.getElementById('spaceHelp');
+    const tipsBox = document.getElementById('tipsBox');
+
+    const spaceHelpTexts = {
+      livingRoom: "فضای پذیرایی معمولاً نیاز به رنگ‌های گرم و کاغذ دیواری ساده دارد. طرح گل‌دار برای دیوار اصلی توصیه نمی‌شود.",
+      kidsRoom: "برای اتاق کودک رنگ‌های ملایم مثل آبی یا سبز نعناعی مناسب است. رنگ باید بدون بو و قابل شستشو باشد.",
+      bathroom: "در حمام از رنگ‌های مقاوم به رطوبت مثل رنگ روغنی استفاده کنید. انتخاب کاغذ دیواری برای حمام توصیه نمی‌شود.",
+      kitchen: "آشپزخانه بهتر است با رنگ‌های قابل شستشو و مقاوم به چربی پوشش داده شود. رنگ‌های روشن باعث بزرگ‌تر دیده شدن فضا می‌شوند.",
+      office: "دفتر کار باید رنگ‌های رسمی و آرامش‌بخش داشته باشد. از رنگ‌های ملایم و نور کافی استفاده کنید."
+    };
+
+    const tipsTexts = {
+      livingRoom: `کاغذ دیواری طرح گل‌دار برای دیوار اصلی پذیرایی توصیه نمی‌شود.<br/>از رنگ‌های گرم استفاده کنید.`,
+      kidsRoom: `رنگ پیشنهادی برای فضای کودک: آبی ملایم یا سبز نعناعی.<br/>از رنگ‌های بدون بو و قابل شستشو استفاده شود.`,
+      bathroom: `برای حمام حتماً از رنگ‌های مقاوم به رطوبت استفاده کنید.<br/>کاغذ دیواری برای حمام توصیه نمی‌شود.`,
+      kitchen: `در آشپزخانه از رنگ‌های قابل شستشو و مقاوم به چربی استفاده کنید.<br/>رنگ‌های روشن فضا را بزرگ‌تر نشان می‌دهند.`,
+      office: `رنگ‌های رسمی و آرامش‌بخش برای دفتر کار مناسب هستند.<br/>نور کافی را فراموش نکنید.`
+    };
+
+    spaceNameSelect.addEventListener('change', () => {
+      const val = spaceNameSelect.value;
+      if (val && spaceHelpTexts[val]) {
+        spaceHelp.textContent = spaceHelpTexts[val];
+        tipsBox.innerHTML = tipsTexts[val];
+      } else {
+        spaceHelp.textContent = "لطفا یک فضای مورد نظر را انتخاب کنید.";
+        tipsBox.innerHTML = `
+          رنگ پیشنهادی برای فضای کودک: آبی ملایم یا سبز نعناعی<br/>
+          کاغذ دیواری طرح گل‌دار برای دیوار اصلی پذیرایی توصیه نمی‌شود<br/>
+          سقف کوتاه داری؟ از رنگ‌های روشن استفاده کن
+        `;
+      }
+    });
+
+    // محاسبه مساحت دیوارها و تعداد قوطی رنگ
+    document.getElementById('calculateBtn').addEventListener('click', () => {
+      const space = spaceNameSelect.value;
+      const length = parseFloat(document.getElementById('length').value);
+      const width = parseFloat(document.getElementById('width').value);
+      const height = parseFloat(document.getElementById('height').value);
+      const wallCount = parseInt(document.getElementById('wallCount').value);
+      const windowArea = parseFloat(document.getElementById('windowArea').value);
+      const wallMaterial = document.getElementById('wallMaterial').value;
+      const paintType = document.getElementById('paintType').value;
+      const paintBrand = document.getElementById('paintBrand').value;
+
+      // اعتبارسنجی اولیه
+      if (!space
