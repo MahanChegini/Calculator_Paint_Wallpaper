@@ -1,180 +1,122 @@
+import { useState } from "react";
+import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
+import { motion } from "framer-motion";
 
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ماشین‌حساب متراژ رنگ و کاغذ دیواری</title>
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Vazirmatn', sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f7f7f7;
-      color: #222;
-      transition: background-color 0.3s, color 0.3s;
-    }
+const roomTips = {
+  "اتاق کودک": "رنگ پیشنهادی: آبی ملایم یا سبز نعناعی. از رنگ‌های بدون بو و ضد حساسیت استفاده کن.",
+  "پذیرایی": "از رنگ‌های گرم و کاغذ دیواری مینیمال استفاده کن. دیوار اصلی رو خیلی شلوغ نکن.",
+  "حمام": "از رنگ‌های روشن و ضد آب استفاده کن. رنگ‌های سرد مثل طوسی روشن مناسب هستن.",
+  "آشپزخانه": "رنگ‌های قابل شست‌وشو و روشن مثل سفید یا کرم. کاغذ دیواری مناسب نیست."
+};
 
-    .dark-mode {
-      background-color: #121212;
-      color: #eee;
-    }
+const brands = {
+  "کاپارول": 320000,
+  "سحر": 250000,
+  "نیپون": 280000
+};
 
-    .container {
-      max-width: 600px;
-      margin: 3rem auto;
-      padding: 2rem;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
-      transition: background 0.3s;
-    }
+const InteriorCalculator = () => {
+  const [theme, setTheme] = useState("light");
+  const [form, setForm] = useState({
+    name: "",
+    width: "",
+    length: "",
+    height: "",
+    walls: "",
+    windowArea: "",
+    wallType: "گچی",
+    brand: "کاپارول"
+  });
 
-    .dark-mode .container {
-      background: #1e1e1e;
-    }
+  const toggleTheme = () => {
+    setTheme(theme === "light" ? "dark" : "light");
+    document.documentElement.classList.toggle("dark");
+  };
 
-    h1 {
-      font-size: 1.6rem;
-      margin-bottom: 1.5rem;
-      text-align: center;
-    }
+  const surfaceArea = () => {
+    const w = parseFloat(form.width);
+    const l = parseFloat(form.length);
+    const h = parseFloat(form.height);
+    const walls = parseInt(form.walls);
+    const win = parseFloat(form.windowArea);
+    if (isNaN(w) || isNaN(l) || isNaN(h) || isNaN(walls)) return 0;
+    return (walls * h * (w + l) / 2) - (win || 0);
+  };
 
-    label {
-      display: block;
-      margin-top: 1rem;
-    }
+  const calcPaint = () => {
+    const area = surfaceArea();
+    const price = brands[form.brand];
+    const literPerM2 = 0.1;
+    const needed = Math.ceil(area * literPerM2 / 4); // assuming each can is 4L
+    return { needed, price: needed * price };
+  };
 
-    input, select {
-      width: 100%;
-      padding: 0.5rem;
-      margin-top: 0.5rem;
-      font-size: 1rem;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-    }
+  const { needed, price } = calcPaint();
 
-    button {
-      margin-top: 1.5rem;
-      padding: 0.75rem;
-      background-color: #005f73;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      width: 100%;
-      font-size: 1rem;
-      transition: background 0.3s;
-    }
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-neutral-900 px-4">
+      <div className="absolute top-4 right-4">
+        <Switch checked={theme === "dark"} onCheckedChange={toggleTheme}>
+          <span className="ml-2">{theme === "dark" ? "🌙" : "☀️"}</span>
+        </Switch>
+      </div>
+      <motion.div
+        className="w-full max-w-xl bg-white dark:bg-neutral-800 p-6 rounded-2xl shadow-2xl"
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <h2 className="text-2xl font-bold mb-4 text-center font-iranYekan dark:text-white">
+          محاسبه‌گر تخصصی طراحی داخلی – مناسب معماران و نقاشان
+        </h2>
+        <div className="space-y-3">
+          <Input
+            placeholder="نام فضا (مثلاً پذیرایی، اتاق کودک، ... )"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+          />
+          <Input placeholder="طول (متر)" value={form.length} onChange={(e) => setForm({ ...form, length: e.target.value })} />
+          <Input placeholder="عرض (متر)" value={form.width} onChange={(e) => setForm({ ...form, width: e.target.value })} />
+          <Input placeholder="ارتفاع (متر)" value={form.height} onChange={(e) => setForm({ ...form, height: e.target.value })} />
+          <Input placeholder="تعداد دیوارها" value={form.walls} onChange={(e) => setForm({ ...form, walls: e.target.value })} />
+          <Input placeholder="مجموع متراژ پنجره‌ها" value={form.windowArea} onChange={(e) => setForm({ ...form, windowArea: e.target.value })} />
+          <select
+            className="w-full p-2 rounded border border-gray-300"
+            value={form.wallType}
+            onChange={(e) => setForm({ ...form, wallType: e.target.value })}
+          >
+            <option>گچی</option>
+            <option>سیمانی</option>
+            <option>رنگ‌شده قبلی</option>
+            <option>کاغذی</option>
+          </select>
+          <select
+            className="w-full p-2 rounded border border-gray-300"
+            value={form.brand}
+            onChange={(e) => setForm({ ...form, brand: e.target.value })}
+          >
+            {Object.keys(brands).map((b) => (
+              <option key={b}>{b}</option>
+            ))}
+          </select>
+        </div>
+        <div className="mt-6 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-white">
+          {form.name && roomTips[form.name] && (
+            <p className="text-sm">💡 {roomTips[form.name]}</p>
+          )}
+          <p className="mt-2">🎨 متراژ سطح: {surfaceArea().toFixed(2)} مترمربع</p>
+          <p>🔲 تعداد قوطی رنگ موردنیاز: {needed} عدد</p>
+          <p>💰 قیمت حدودی: {price.toLocaleString()} تومان</p>
+        </div>
+        <div className="mt-4 text-sm text-gray-700 dark:text-gray-300">
+          <p>• رنگ پیشنهادی برای فضای کودک: آبی ملایم یا سبز نعناعی</p>
+          <p>• کاغذ دیواری طرح گل‌دار برای دیوار اصلی پذیرایی توصیه نمی‌شود</p>
+          <p>• سقف کوتاه داری؟ از رنگ‌های روشن استفاده کن</p>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
 
-    button:hover {
-      background-color: #0a9396;
-    }
-
-    .result {
-      margin-top: 2rem;
-      font-size: 1.1rem;
-      padding: 1rem;
-      background: #e0fbfc;
-      border-radius: 8px;
-    }
-
-    .dark-mode .result {
-      background: #2b2b2b;
-    }
-
-    .toggle-theme {
-      position: absolute;
-      top: 1rem;
-      left: 1rem;
-      cursor: pointer;
-      background: none;
-      border: 2px solid #444;
-      padding: 0.3rem 0.8rem;
-      border-radius: 6px;
-      font-size: 0.9rem;
-    }
-
-    footer {
-      margin-top: 3rem;
-      text-align: center;
-      font-size: 0.8rem;
-      color: #888;
-    }
-
-    .dark-mode footer {
-      color: #aaa;
-    }
-  </style>
-</head>
-<body>
-  <button class="toggle-theme" onclick="toggleDarkMode()">🌓 حالت شب</button>
-  <div class="container">
-    <h1>ماشین‌حساب متراژ رنگ و کاغذ دیواری</h1>
-    <label>نوع پوشش:</label>
-    <select id="type">
-      <option value="paint">رنگ</option>
-      <option value="wallpaper">کاغذ دیواری</option>
-    </select>
-
-    <label>طول دیوار (متر):</label>
-    <input type="number" id="length" placeholder="مثلاً ۵" />
-
-    <label>عرض دیوار (متر):</label>
-    <input type="number" id="width" placeholder="مثلاً ۴" />
-
-    <label>ارتفاع دیوار (متر):</label>
-    <input type="number" id="height" placeholder="مثلاً ۲.۸" />
-
-    <button onclick="calculate()">محاسبه</button>
-
-    <div class="result" id="result" style="display:none;"></div>
-  </div>
-
-  <footer>© 2025 Smilene. All rights reserved.</footer>
-
-  <script>
-    function toggleDarkMode() {
-      document.body.classList.toggle('dark-mode');
-    }
-
-    function calculate() {
-      const type = document.getElementById("type").value;
-      const length = parseFloat(document.getElementById("length").value);
-      const width = parseFloat(document.getElementById("width").value);
-      const height = parseFloat(document.getElementById("height").value);
-      const resultDiv = document.getElementById("result");
-
-      if (isNaN(length) || isNaN(width) || isNaN(height)) {
-        resultDiv.style.display = "block";
-        resultDiv.innerText = "لطفاً همه‌ی مقادیر را به درستی وارد کنید.";
-        return;
-      }
-
-      const wallArea = 2 * (length + width) * height;
-
-      let coverage = 1, costPerUnit = 0, units = 0, totalCost = 0;
-
-      if (type === "paint") {
-        coverage = 10; // متر مربع هر قوطی
-        costPerUnit = 350000; // تومان
-      } else {
-        coverage = 5.3; // متر مربع هر رول کاغذ دیواری
-        costPerUnit = 400000; // تومان
-      }
-
-      units = Math.ceil(wallArea / coverage);
-      totalCost = units * costPerUnit;
-
-      resultDiv.style.display = "block";
-      resultDiv.innerHTML = `
-        <p>مساحت کل دیوارها: ${wallArea.toFixed(2)} متر مربع</p>
-        <p>تعداد ${type === "paint" ? "قوطی رنگ" : "رول کاغذ دیواری"} مورد نیاز: ${units}</p>
-        <p>هزینه تقریبی: ${totalCost.toLocaleString()} تومان</p>
-      `;
-    }
-  </script>
-</body>
-</html>
+export default InteriorCalculator;
