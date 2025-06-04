@@ -1,395 +1,267 @@
 <!DOCTYPE html>
-<html lang="fa">
+<html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>محاسبه‌گر تخصصی طراحی داخلی</title>
-  
-  <!-- فونت وزیر از گوگل فونت -->
-  <link href="https://cdn.fontcdn.ir/woff/ Vazir.woff2" rel="stylesheet" />
-  <style>
-    @font-face {
-      font-family: 'Vazir';
-      src: url('https://cdn.fontcdn.ir/woff/Vazir.woff2') format('woff2');
-      font-weight: normal;
-      font-style: normal;
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>محاسبه‌گر تخصصی طراحی داخلی</title>
+<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet" />
+<style>
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0; 
+    font-family: 'Vazir', Tahoma, sans-serif;
+    background: #f7f9fc;
+    color: #333;
+    min-height: 100vh;
+    padding: 20px;
+    transition: background-color 0.4s,color 0.4s;
+    direction: rtl;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  body.dark {
+    background: #121212;
+    color: #eee;
+  }
+  .container {
+    max-width: 480px;
+    width: 100%;
+    background: rgba(255 255 255 / 0.85);
+    padding: 30px 30px 40px;
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    backdrop-filter: blur(12px);
+    transition: background-color 0.4s,color 0.4s;
+  }
+  body.dark .container {
+    background: rgba(18 18 18 / 0.8);
+    box-shadow: 0 8px 24px rgba(255 255 255 / 0.12);
+  }
+  header {
+    text-align: center;
+    margin-bottom: 25px;
+    user-select: none;
+  }
+  header h1 {
+    font-weight: 700;
+    font-size: 1.8rem;
+    letter-spacing: 1px;
+  }
+  .toggle-theme {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: transparent;
+    border: none;
+    font-size: 1.9rem;
+    cursor: pointer;
+    color: #333;
+    transition: color 0.4s;
+    user-select: none;
+    z-index: 1000;
+  }
+  body.dark .toggle-theme {
+    color: #eee;
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: block;
+  }
+  select, input[type="number"] {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 1rem;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    background: #fafafa;
+    transition: border-color 0.3s;
+    font-family: 'Vazir', Tahoma, sans-serif;
+    color: #333;
+    outline-offset: 2px;
+  }
+  select:focus, input[type="number"]:focus {
+    border-color: #357edd;
+    background: #fff;
+  }
+  body.dark select, 
+  body.dark input[type="number"] {
+    background: #222;
+    border-color: #555;
+    color: #eee;
+  }
+  body.dark select:focus, 
+  body.dark input[type="number"]:focus {
+    border-color: #5a9bf6;
+    background: #333;
+  }
+  .helper-text {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: -10px;
+    margin-bottom: 8px;
+    user-select: none;
+  }
+  body.dark .helper-text {
+    color: #bbb;
+  }
+  button[type="submit"] {
+    padding: 14px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    border-radius: 15px;
+    border: none;
+    background: #357edd;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    user-select: none;
+    box-shadow: 0 4px 12px rgb(53 126 221 / 0.5);
+  }
+  button[type="submit"]:hover {
+    background: #2b62c7;
+  }
+  body.dark button[type="submit"] {
+    background: #5a9bf6;
+    box-shadow: 0 4px 12px rgb(90 155 246 / 0.7);
+  }
+  body.dark button[type="submit"]:hover {
+    background: #4d86db;
+  }
+  .result-box {
+    margin-top: 30px;
+    background: rgba(53, 126, 221, 0.1);
+    border-radius: 15px;
+    padding: 20px 25px;
+    font-size: 1rem;
+    color: #1a2a52;
+    user-select: none;
+    box-shadow: 0 0 12px rgba(53,126,221,0.15);
+    transition: background-color 0.4s, color 0.4s;
+    white-space: pre-wrap;
+  }
+  body.dark .result-box {
+    background: rgba(90, 155, 246, 0.2);
+    color: #dbe9ff;
+    box-shadow: 0 0 14px rgba(90,155,246,0.6);
+  }
+  @media (max-width: 520px) {
+    .container {
+      max-width: 95vw;
+      padding: 20px;
     }
-    * {
-      box-sizing: border-box;
-      font-family: 'Vazir', sans-serif;
-      direction: rtl;
+    header h1 {
+      font-size: 1.4rem;
     }
-    body {
-      margin: 0; padding: 0;
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transition: background 0.3s ease;
-    }
-    .dark {
-      background: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%);
-      color: #eee;
-    }
-
-    /* پس‌زمینه مینیمال خطوط پلان */
-    body::before {
-      content: "";
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background-image:
-        linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px);
-      background-size: 40px 40px;
-      pointer-events: none;
-      z-index: -1;
-      transition: background 0.3s ease;
-    }
-    .dark body::before {
-      background-image:
-        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-    }
-
-    /* فرم وسط صفحه با انیمیشن */
-    .form-container {
-      background: rgba(255, 255, 255, 0.25);
-      backdrop-filter: blur(15px);
-      border-radius: 15px;
-      padding: 25px 35px;
-      max-width: 450px;
-      width: 90vw;
-      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-      animation: fadeInScale 0.5s ease forwards;
-      position: relative;
-    }
-    .dark .form-container {
-      background: rgba(30, 30, 40, 0.5);
-      box-shadow: 0 8px 32px 0 rgba(255, 255, 255, 0.1);
-    }
-    @keyframes fadeInScale {
-      from {opacity: 0; transform: scale(0.9);}
-      to {opacity: 1; transform: scale(1);}
-    }
-
-    h1 {
-      font-weight: 700;
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-      text-align: center;
-      color: #1e2d4a;
-    }
-    .dark h1 {
-      color: #a8c0ff;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: 600;
-      color: #333;
-    }
-    .dark label {
-      color: #ccc;
-    }
-
-    input[type="text"],
-    input[type="number"],
-    select {
-      width: 100%;
-      padding: 8px 12px;
-      margin-bottom: 15px;
-      border-radius: 8px;
-      border: 1.5px solid #aaa;
-      font-size: 1rem;
-      transition: border-color 0.3s ease;
-      background: #fff;
-      color: #222;
-    }
-    .dark input[type="text"],
-    .dark input[type="number"],
-    .dark select {
-      background: #222;
-      color: #eee;
-      border-color: #666;
-    }
-    input[type="text"]:focus,
-    input[type="number"]:focus,
-    select:focus {
-      border-color: #4a90e2;
-      outline: none;
-    }
-
-    /* دکمه سوییچ تم */
-    .theme-switch-wrapper {
-      position: fixed;
-      top: 15px;
-      right: 15px;
-      background: rgba(255,255,255,0.3);
-      border-radius: 50px;
-      padding: 5px 10px;
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      transition: background 0.3s ease;
-      z-index: 1000;
-    }
-    .dark .theme-switch-wrapper {
-      background: rgba(0,0,0,0.5);
-    }
-    .theme-switch-wrapper span {
-      font-size: 1.2rem;
-      margin: 0 5px;
-    }
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 50px;
-      height: 26px;
-    }
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: #ccc;
-      transition: 0.4s;
-      border-radius: 34px;
-    }
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 20px;
-      width: 20px;
-      left: 4px;
-      bottom: 3px;
-      background-color: white;
-      transition: 0.4s;
-      border-radius: 50%;
-    }
-    input:checked + .slider {
-      background-color: #2196F3;
-    }
-    input:checked + .slider:before {
-      transform: translateX(24px);
-    }
-
-    /* باکس نکات */
-    .tips-box {
-      margin-top: 15px;
-      padding: 12px 15px;
-      background: rgba(255, 255, 255, 0.3);
-      border-radius: 12px;
-      font-size: 0.9rem;
-      line-height: 1.4;
-      color: #333;
-    }
-    .dark .tips-box {
-      background: rgba(50, 50, 60, 0.6);
-      color: #ddd;
-    }
-
-    /* دکمه محاسبه */
-    button {
-      width: 100%;
-      padding: 12px;
-      background-color: #4a90e2;
-      color: white;
-      font-size: 1.1rem;
-      font-weight: 700;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    button:hover {
-      background-color: #357ABD;
-    }
-
-    /* بخش نمایش نتیجه */
-    .result-box {
-      margin-top: 20px;
-      background: rgba(255,255,255,0.3);
-      border-radius: 12px;
-      padding: 15px;
-      font-size: 1rem;
-      color: #111;
-      min-height: 80px;
-    }
-    .dark .result-box {
-      background: rgba(40,40,50,0.7);
-      color: #eee;
-    }
-
-    /* آیکون‌ها */
-    .material-icon {
-      width: 18px;
-      height: 18px;
-      vertical-align: middle;
-      margin-left: 5px;
-      opacity: 0.7;
-    }
-    /* راهنمایی هر فضا */
-    .help-text {
-      font-size: 0.85rem;
-      color: #555;
-      margin-bottom: 10px;
-      font-style: italic;
-    }
-    .dark .help-text {
-      color: #aaa;
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
+<button class="toggle-theme" id="toggleTheme" aria-label="تغییر تم تاریک و روشن">🌙</button>
+<div class="container" role="main">
+  <header>
+    <h1>محاسبه‌گر تخصصی طراحی داخلی</h1>
+  </header>
 
-  <!-- دکمه تغییر تم -->
-  <div class="theme-switch-wrapper" title="تغییر حالت روشن/تاریک">
-    <span>✨</span>
-    <label class="switch">
-      <input type="checkbox" id="themeToggle" />
-      <span class="slider"></span>
-    </label>
-    <span>🌙</span>
-  </div>
-
-  <div class="form-container" role="main" aria-label="فرم محاسبه‌گر طراحی داخلی">
-
-    <h1>محاسبه‌گر تخصصی طراحی داخلی<br><small>مناسب معماران و نقاشان</small></h1>
-
-    <!-- نام فضا -->
-    <label for="spaceName">نام فضا</label>
-    <select id="spaceName" required aria-describedby="spaceHelp" aria-required="true">
-      <option value="">انتخاب کنید...</option>
-      <option value="livingRoom">پذیرایی</option>
-      <option value="kidsRoom">اتاق کودک</option>
-      <option value="bathroom">حمام</option>
+  <form id="calcForm" novalidate>
+    <label for="space">نام فضا</label>
+    <select id="space" name="space" required aria-describedby="spaceHelp">
+      <option value="" disabled selected>انتخاب کنید...</option>
+      <option value="living">پذیرایی</option>
+      <option value="kids">اتاق کودک</option>
       <option value="kitchen">آشپزخانه</option>
-      <option value="office">دفتر کار</option>
+      <option value="bathroom">حمام</option>
+      <option value="office">فضای کار</option>
     </select>
-    <div id="spaceHelp" class="help-text" aria-live="polite">لطفا یک فضای مورد نظر را انتخاب کنید.</div>
+    <small id="spaceHelp" class="helper-text">فضای مورد نظر را انتخاب کنید</small>
 
-    <!-- ابعاد -->
     <label for="length">طول (متر)</label>
-    <input type="number" id="length" min="1" step="0.1" placeholder="مثلاً 5" required />
+    <input type="number" id="length" name="length" min="0.5" step="0.1" required placeholder="مثلاً ۴.۵" aria-describedby="lengthHelp" />
+    <small id="lengthHelp" class="helper-text">طول اتاق را وارد کنید (متر)</small>
 
     <label for="width">عرض (متر)</label>
-    <input type="number" id="width" min="1" step="0.1" placeholder="مثلاً 4" required />
+    <input type="number" id="width" name="width" min="0.5" step="0.1" required placeholder="مثلاً ۳.۲" aria-describedby="widthHelp" />
+    <small id="widthHelp" class="helper-text">عرض اتاق را وارد کنید (متر)</small>
 
     <label for="height">ارتفاع (متر)</label>
-    <input type="number" id="height" min="1.5" step="0.1" placeholder="مثلاً 3" required />
+    <input type="number" id="height" name="height" min="1" step="0.1" required placeholder="مثلاً ۲.۸" aria-describedby="heightHelp" />
+    <small id="heightHelp" class="helper-text">ارتفاع سقف را وارد کنید (متر)</small>
 
-    <!-- تعداد دیوارها -->
-    <label for="wallCount">تعداد دیوارها</label>
-    <input type="number" id="wallCount" min="1" max="6" step="1" placeholder="مثلاً 4" required />
+    <label for="walls">تعداد دیوارها</label>
+    <input type="number" id="walls" name="walls" min="1" max="6" step="1" required placeholder="مثلاً ۴" aria-describedby="wallsHelp" />
+    <small id="wallsHelp" class="helper-text">تعداد دیوارهایی که رنگ یا کاغذ می‌خورند</small>
 
-    <!-- متراژ پنجره‌ها -->
-    <label for="windowArea">متراژ کل پنجره‌ها (متر مربع)</label>
-    <input type="number" id="windowArea" min="0" step="0.1" placeholder="مثلاً 3.5" value="0" required />
+    <label for="windows">متراژ پنجره‌ها (متر مربع)</label>
+    <input type="number" id="windows" name="windows" min="0" step="0.1" value="0" required placeholder="مثلاً ۲.۵" aria-describedby="windowsHelp" />
+    <small id="windowsHelp" class="helper-text">متراژ پنجره‌ها را برای کسر کردن وارد کنید</small>
 
-    <!-- جنس دیوار -->
     <label for="wallMaterial">جنس دیوار</label>
-    <select id="wallMaterial" required>
-      <option value="">انتخاب کنید...</option>
+    <select id="wallMaterial" name="wallMaterial" required aria-describedby="wallMaterialHelp">
+      <option value="" disabled selected>انتخاب کنید...</option>
       <option value="plaster">گچی</option>
       <option value="cement">سیمانی</option>
       <option value="painted">رنگ‌شده قبلی</option>
-      <option value="wallpaper">کاغذی</option>
+      <option value="papered">کاغذدیواری</option>
     </select>
+    <small id="wallMaterialHelp" class="helper-text">جنس دیوار را انتخاب کنید</small>
 
-    <!-- نوع رنگ -->
-    <label for="paintType">نوع رنگ</label>
-    <select id="paintType" required>
-      <option value="">انتخاب کنید...</option>
-      <option value="plastic" data-price="150000">پلاستیکی (هر لیتر 150,000 تومان)</option>
-      <option value="acrylic" data-price="250000">اکریلیک (هر لیتر 250,000 تومان)</option>
-      <option value="oil" data-price="300000">روغنی (هر لیتر 300,000 تومان)</option>
+    <label for="finishType">نوع پوشش نهایی</label>
+    <select id="finishType" name="finishType" required aria-describedby="finishTypeHelp">
+      <option value="" disabled selected>انتخاب کنید...</option>
+      <option value="paintPlastic">رنگ پلاستیکی</option>
+      <option value="paintAcrylic">رنگ اکریلیک</option>
+      <option value="paintOil">رنگ روغنی</option>
+      <option value="wallpaper">کاغذدیواری</option>
     </select>
+    <small id="finishTypeHelp" class="helper-text">نوع رنگ یا کاغذدیواری را انتخاب کنید</small>
 
-    <!-- برند رنگ -->
-    <label for="paintBrand">برند رنگ</label>
-    <select id="paintBrand" required>
-      <option value="">انتخاب کنید...</option>
-      <option value="kaparol">کاپارول</option>
-      <option value="sahar">سحر</option>
-      <option value="nippon">نیپون</option>
-    </select>
+    <button type="submit" aria-label="محاسبه متراژ و قیمت">محاسبه</button>
+  </form>
 
-    <button id="calculateBtn">محاسبه</button>
+  <section class="result-box" id="result" aria-live="polite" aria-atomic="true" tabindex="0"></section>
+</div>
 
-    <!-- نمایش نتایج -->
-    <div class="result-box" id="result" aria-live="polite" role="region" tabindex="0">
-      نتیجه محاسبه اینجا نمایش داده می‌شود.
-    </div>
+<script>
+  // تم تاریک روشن
+  const toggleBtn = document.getElementById('toggleTheme');
+  toggleBtn.onclick = () => {
+    document.body.classList.toggle('dark');
+    if(document.body.classList.contains('dark')) {
+      toggleBtn.textContent = '☀️';
+      toggleBtn.setAttribute('aria-label', 'تغییر به تم روشن');
+    } else {
+      toggleBtn.textContent = '🌙';
+      toggleBtn.setAttribute('aria-label', 'تغییر به تم تاریک');
+    }
+  };
 
-    <!-- نکات پیشنهادی -->
-    <div class="tips-box" id="tipsBox" aria-live="polite">
-      رنگ پیشنهادی برای فضای کودک: آبی ملایم یا سبز نعناعی<br/>
-      کاغذ دیواری طرح گل‌دار برای دیوار اصلی پذیرایی توصیه نمی‌شود<br/>
-      سقف کوتاه داری؟ از رنگ‌های روشن استفاده کن
-    </div>
-  </div>
+  // فرم و محاسبات
+  const form = document.getElementById('calcForm');
+  const resultBox = document.getElementById('result');
 
-  <script>
-    // تغییر تم روشن/تاریک
-    const themeToggle = document.getElementById('themeToggle');
-    themeToggle.addEventListener('change', () => {
-      document.body.classList.toggle('dark', themeToggle.checked);
-    });
+  // قیمت‌ها (تومان بر متر مربع)
+  const pricePerSqm = {
+    plaster: 25000,
+    cement: 20000,
+    painted: 22000,
+    papered: 30000
+  };
 
-    // راهنمایی براساس نام فضا
-    const spaceNameSelect = document.getElementById('spaceName');
-    const spaceHelp = document.getElementById('spaceHelp');
-    const tipsBox = document.getElementById('tipsBox');
+  const finishPriceMultiplier = {
+    paintPlastic: 1,
+    paintAcrylic: 1.3,
+    paintOil: 1.6,
+    wallpaper: 1.7
+  };
 
-    const spaceHelpTexts = {
-      livingRoom: "فضای پذیرایی معمولاً نیاز به رنگ‌های گرم و کاغذ دیواری ساده دارد. طرح گل‌دار برای دیوار اصلی توصیه نمی‌شود.",
-      kidsRoom: "برای اتاق کودک رنگ‌های ملایم مثل آبی یا سبز نعناعی مناسب است. رنگ باید بدون بو و قابل شستشو باشد.",
-      bathroom: "در حمام از رنگ‌های مقاوم به رطوبت مثل رنگ روغنی استفاده کنید. انتخاب کاغذ دیواری برای حمام توصیه نمی‌شود.",
-      kitchen: "آشپزخانه بهتر است با رنگ‌های قابل شستشو و مقاوم به چربی پوشش داده شود. رنگ‌های روشن باعث بزرگ‌تر دیده شدن فضا می‌شوند.",
-      office: "دفتر کار باید رنگ‌های رسمی و آرامش‌بخش داشته باشد. از رنگ‌های ملایم و نور کافی استفاده کنید."
-    };
-
-    const tipsTexts = {
-      livingRoom: `کاغذ دیواری طرح گل‌دار برای دیوار اصلی پذیرایی توصیه نمی‌شود.<br/>از رنگ‌های گرم استفاده کنید.`,
-      kidsRoom: `رنگ پیشنهادی برای فضای کودک: آبی ملایم یا سبز نعناعی.<br/>از رنگ‌های بدون بو و قابل شستشو استفاده شود.`,
-      bathroom: `برای حمام حتماً از رنگ‌های مقاوم به رطوبت استفاده کنید.<br/>کاغذ دیواری برای حمام توصیه نمی‌شود.`,
-      kitchen: `در آشپزخانه از رنگ‌های قابل شستشو و مقاوم به چربی استفاده کنید.<br/>رنگ‌های روشن فضا را بزرگ‌تر نشان می‌دهند.`,
-      office: `رنگ‌های رسمی و آرامش‌بخش برای دفتر کار مناسب هستند.<br/>نور کافی را فراموش نکنید.`
-    };
-
-    spaceNameSelect.addEventListener('change', () => {
-      const val = spaceNameSelect.value;
-      if (val && spaceHelpTexts[val]) {
-        spaceHelp.textContent = spaceHelpTexts[val];
-        tipsBox.innerHTML = tipsTexts[val];
-      } else {
-        spaceHelp.textContent = "لطفا یک فضای مورد نظر را انتخاب کنید.";
-        tipsBox.innerHTML = `
-          رنگ پیشنهادی برای فضای کودک: آبی ملایم یا سبز نعناعی<br/>
-          کاغذ دیواری طرح گل‌دار برای دیوار اصلی پذیرایی توصیه نمی‌شود<br/>
-          سقف کوتاه داری؟ از رنگ‌های روشن استفاده کن
-        `;
-      }
-    });
-
-    // محاسبه مساحت دیوارها و تعداد قوطی رنگ
-    document.getElementById('calculateBtn').addEventListener('click', () => {
-      const space = spaceNameSelect.value;
-      const length = parseFloat(document.getElementById('length').value);
-      const width = parseFloat(document.getElementById('width').value);
-      const height = parseFloat(document.getElementById('height').value);
-      const wallCount = parseInt(document.getElementById('wallCount').value);
-      const windowArea = parseFloat(document.getElementById('windowArea').value);
-      const wallMaterial = document.getElementById('wallMaterial').value;
-      const paintType = document.getElementById('paintType').value;
-      const paintBrand = document.getElementById('paintBrand').value;
-
-      // اعتبارسنجی اولیه
-      if (!space
+  // پیشنهادها براساس فضا
+  const suggestions = {
+    living: 'برای پذیرایی: رنگ‌های روشن
